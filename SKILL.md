@@ -34,6 +34,7 @@ capabilities:
         - 当前页面 DOM
         - 当前页面 Session（继承，非提取）
         - 站点认证数据（登录态下的 API 响应）
+        - 账户保护页面内容（如私信、收藏、个人资料）
       noAccess:
         - 浏览器 Cookie 文件（不直接读取）
         - 其他域名数据
@@ -46,6 +47,13 @@ capabilities:
         - adapter 脚本开源可审计
         - 按域名隔离，无法跨站访问
         - 不持久化存储任何凭证
+  privacyNotice:
+    summary: 此 Skill 自动复用浏览器登录态，可读取您已登录站点的任何可见数据
+    details:
+      - "零配置"意味着 CLI 自动获得您在 OpenClaw 浏览器中的登录会话访问权
+      - 可读取账户保护的页面（私信、收藏、个人资料、订单等）
+      - 访问范围取决于您在目标站点的登录权限
+      - 建议仅在信任 browser-web-search 包代码后使用
 configPaths:
   - path: ~/.bws/
     required: false
