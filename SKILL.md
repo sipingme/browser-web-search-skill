@@ -7,6 +7,34 @@ type: cli
 requires:
   - npm: browser-web-search
   - node: ">=18.0.0"
+  - binary: openclaw
+binaries:
+  - name: bws
+    source: npm install -g browser-web-search
+    verify: bws --version
+  - name: openclaw
+    source: OpenClaw 安装包
+    verify: openclaw --version
+install:
+  command: npm install -g browser-web-search
+  riskLevel: moderate
+  riskReason: 全局安装第三方 npm 包，会在主机上执行未经审计的代码。包代码不包含在此 Skill 中，需独立审查。
+  requiresApproval: true
+capabilities:
+  sensitive:
+    - type: browser-session-access
+      description: 通过 OpenClaw 在已认证的浏览器标签页中执行 JavaScript
+      scope: 按 adapter 域名隔离（如 zhihu.com, xiaohongshu.com）
+      access:
+        - 当前页面 DOM
+        - 当前页面 Session（继承，非提取）
+      noAccess:
+        - 浏览器 Cookie 文件
+        - 其他域名数据
+        - 用户配置目录
+configPaths:
+  - path: ~/.bws/
+    required: false
 tags:
   - browser
   - web-search
