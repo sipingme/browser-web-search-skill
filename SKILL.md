@@ -27,15 +27,25 @@ install:
 capabilities:
   sensitive:
     - type: browser-session-access
+      riskLevel: high
       description: 通过 OpenClaw 在已认证的浏览器标签页中执行 JavaScript
       scope: 按 adapter 域名隔离（如 zhihu.com, xiaohongshu.com）
       access:
         - 当前页面 DOM
         - 当前页面 Session（继承，非提取）
+        - 站点认证数据（登录态下的 API 响应）
       noAccess:
-        - 浏览器 Cookie 文件
+        - 浏览器 Cookie 文件（不直接读取）
         - 其他域名数据
         - 用户配置目录
+      risks:
+        - 第三方 npm 包（browser-web-search）在页面上下文中执行，可访问站点认证数据
+        - 恶意代码可能窃取 cookies 或页面内容
+        - 包代码不包含在此 Skill 中，需独立审计
+      mitigations:
+        - adapter 脚本开源可审计
+        - 按域名隔离，无法跨站访问
+        - 不持久化存储任何凭证
 configPaths:
   - path: ~/.bws/
     required: false
