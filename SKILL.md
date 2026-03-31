@@ -5,16 +5,20 @@ version: 0.1.0
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
-  - npm: browser-web-search
-  - node: ">=18.0.0"
-  - binary: openclaw
-binaries:
-  - name: bws
-    source: npm install -g browser-web-search
-    verify: bws --version
-  - name: openclaw
-    source: OpenClaw 安装包
-    verify: openclaw --version
+  runtime:
+    - name: node
+      version: ">=18.0.0"
+      description: Node.js 运行时
+    - name: npm
+      description: Node.js 包管理器（随 Node.js 安装）
+  packages:
+    - npm: browser-web-search
+      global: true
+  binaries:
+    - name: bws
+      providedBy: browser-web-search
+    - name: openclaw
+      description: OpenClaw CLI，用于浏览器自动化
 install:
   command: npm install -g browser-web-search
   riskLevel: moderate
