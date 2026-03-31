@@ -24,6 +24,16 @@ install:
   riskLevel: moderate
   riskReason: 全局安装第三方 npm 包，会在主机上执行未经审计的代码。包代码不包含在此 Skill 中，需独立审查。
   requiresApproval: true
+  source:
+    registry: npmjs.com
+    package: browser-web-search
+    repository: https://github.com/sipingme/browser-web-search
+    npm: https://www.npmjs.com/package/browser-web-search
+  verification:
+    - 安装前请审查 GitHub 仓库代码
+    - 检查 npm 包的下载量和维护状态
+    - 对比 npm 发布版本与 GitHub 源码是否一致
+  note: 此 Skill 仅包含使用说明，运行时行为完全取决于外部 npm 包
 capabilities:
   sensitive:
     - type: browser-session-access
