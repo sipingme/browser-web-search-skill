@@ -284,6 +284,54 @@ bws bing/search "machine learning"
 
 ---
 
+## 🔧 技术架构：如何访问登录态
+
+BWS **不直接读取**浏览器 Cookie 文件或用户配置文件。它通过 OpenClaw 提供的 API 与浏览器交互：
+
+```
+bws 命令
+    ↓ 调用
+openclaw browser evaluate <script>
+    ↓ 在已打开的标签页中执行 JavaScript
+目标网站（使用该标签页的登录态）
+```
+
+### 工作原理
+
+1. **BWS 调用 OpenClaw CLI**：
+   ```bash
+   openclaw browser evaluate --domain "zhihu.com" "<adapter-script>"
+   ```
+
+2. **OpenClaw 在浏览器标签页中执行脚本**：
+   - 找到匹配域名的已打开标签页
+   - 或打开新标签页访问目标网站
+   - 在页面上下文中执行 adapter 脚本
+
+3. **脚本在页面中运行**：
+   - 脚本以网页的身份运行（如同 DevTools Console）
+   - 自动继承该页面的登录态（Cookie、Session）
+   - 通过 DOM 操作或 fetch 获取数据
+
+### 数据访问范围
+
+| 访问内容 | 是否访问 | 说明 |
+|---------|---------|------|
+| 浏览器 Cookie 文件 | ❌ 否 | 不直接读取 `~/.config/chromium/Cookies` 等文件 |
+| 用户配置目录 | ❌ 否 | 不访问 `~/.bws/` 以外的配置 |
+| 其他网站数据 | ❌ 否 | 只能访问 adapter 指定的域名 |
+| 当前页面 DOM | ✅ 是 | adapter 脚本在页面中执行 |
+| 当前页面 Session | ✅ 是 | 继承页面的登录状态 |
+
+### 安全边界
+
+- **隔离性**：每个 adapter 只能访问其声明的 `domain`
+- **透明性**：所有 adapter 代码是公开的 JS 文件，可审计
+- **无持久化**：BWS 不保存任何 Cookie 或 Session Token
+- **用户控制**：登录操作由用户在浏览器中手动完成
+
+---
+
 ## ⚠️ 登录态管理
 
 如果网站需要登录，命令会返回 401/403 错误。
@@ -295,12 +343,14 @@ bws bing/search "machine learning"
    openclaw browser open https://xiaohongshu.com
    ```
 
-2. 手动完成登录
+2. 手动完成登录（BWS 不参与此过程）
 
 3. 重试命令：
    ```bash
    bws xiaohongshu/me
    ```
+
+**注意**：BWS 只是在已登录的页面中执行脚本，不会存储或传输你的登录凭证。
 
 ---
 
