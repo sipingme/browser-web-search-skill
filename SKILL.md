@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 把任何网站变成命令行 API。13 平台 41 命令 — 知乎、小红书、B站、GitHub、豆瓣等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.2.0
+description: 把任何网站变成命令行 API。13 平台 41 命令 — 头条、小红书、知乎、B站、GitHub、豆瓣等。专为 OpenClaw 设计，复用浏览器登录态。
+version: 0.2.1
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -139,17 +139,23 @@ bws bilibili/popular               # B站热门
 bws github/repo facebook/react     # GitHub 仓库
 ```
 
-## 📊 内置平台（13 平台 41 命令）
+## 📊 内置平台（13 个）
 
-| 分类 | 平台 | 命令数 | 示例命令 |
-|-----|-----|-------|---------|
-| **搜索** | Google, Baidu, Bing | 3 | `bws google/search "query"` |
-| **社交** | 小红书, 知乎 | 10 | `bws zhihu/hot` |
-| **新闻** | 36kr, 今日头条 | 3 | `bws 36kr/newsflash` |
-| **开发** | GitHub, CSDN, 博客园 | 8 | `bws github/repo owner/repo` |
-| **视频** | Bilibili | 9 | `bws bilibili/popular` |
-| **娱乐** | 豆瓣 | 6 | `bws douban/top250` |
-| **招聘** | BOSS直聘 | 2 | `bws boss/search "职位"` |
+| 平台 | 说明 | 命令 |
+|-----|------|-----|
+| **今日头条** | 新闻资讯 | `toutiao/hot`, `toutiao/search` |
+| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/user_posts` |
+| **36kr** | 科技创投 | `36kr/newsflash` |
+| **知乎** | 问答社区 | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |
+| **CSDN** | 开发者社区 | `csdn/search` |
+| **博客园** | 技术博客 | `cnblogs/search` |
+| **豆瓣** | 影视书籍 | `douban/movie`, `douban/search`, `douban/top250`, `douban/movie-hot`, `douban/movie-top`, `douban/comments` |
+| **Bilibili** | 视频弹幕 | `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/search`, `bilibili/video`, `bilibili/comments`, `bilibili/feed`, `bilibili/history`, `bilibili/me` |
+| **BOSS直聘** | 招聘平台 | `boss/search`, `boss/detail` |
+| **GitHub** | 代码托管 | `github/repo`, `github/issues`, `github/fork`, `github/pr-create`, `github/issue-create` |
+| **Baidu** | 百度搜索 | `baidu/search` |
+| **Bing** | 必应搜索 | `bing/search` |
+| **Google** | 谷歌搜索 | `google/search` |
 
 ## 🔧 标准操作流程 (SOP)
 
@@ -487,8 +493,8 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.2.0
-- **最后更新**: 2026-04-06
+- **版本**: 0.2.1
+- **最后更新**: 2026-04-07
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
 
