@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
 description: 把任何网站变成命令行 API。13 平台 41 命令 — 头条、小红书、知乎、B站、GitHub、豆瓣等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.2.1
+version: 0.2.2
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -493,7 +493,7 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.2.1
+- **版本**: 0.2.2
 - **最后更新**: 2026-04-07
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
