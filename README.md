@@ -18,7 +18,7 @@ npx --yes browser-web-search site bilibili/popular      # B站热门
 npx --yes browser-web-search site zhihu/hot --jq '.items[].title'
 ```
 
-## 内置平台（16 个）
+## 内置平台（17 个）
 
 | 平台 | 命令 |
 |-----|------|
@@ -28,6 +28,7 @@ npx --yes browser-web-search site zhihu/hot --jq '.items[].title'
 | **网易新闻** | `netease/hot` |
 | **新浪新闻** | `sina/hot` |
 | **微博** | `weibo/hot` |
+| **微信公众号** | `weixin/search`, `weixin/article` |
 | **小红书** | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/feed`, `xiaohongshu/me`, `xiaohongshu/user_posts` |
 | **36kr** | `36kr/newsflash`, `36kr/search`, `36kr/article` |
 | **知乎** | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |

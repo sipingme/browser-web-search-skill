@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 把任何网站变成命令行 API。16 平台 35 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.3.0
+description: 把任何网站变成命令行 API。17 平台 37 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。
+version: 0.3.1
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -139,7 +139,7 @@ bws bilibili/popular               # B站热门
 bws weibo/hot                      # 微博热搜
 ```
 
-## 📊 内置平台（16 个）
+## 📊 内置平台（17 个）
 
 | 平台 | 说明 | 命令 |
 |-----|------|-----|
@@ -149,6 +149,7 @@ bws weibo/hot                      # 微博热搜
 | **网易新闻** | 热点新闻 | `netease/hot` |
 | **新浪新闻** | 门户新闻 | `sina/hot` |
 | **微博** | 社交热搜 | `weibo/hot` |
+| **微信公众号** | 公众号文章 | `weixin/search`, `weixin/article` |
 | **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/feed`, `xiaohongshu/me`, `xiaohongshu/user_posts` |
 | **36kr** | 科技创投 | `36kr/newsflash`, `36kr/search`, `36kr/article` |
 | **知乎** | 问答社区 | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |
@@ -500,7 +501,7 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.3.0
+- **版本**: 0.3.1
 - **最后更新**: 2026-04-10
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
