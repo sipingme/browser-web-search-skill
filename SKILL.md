@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 把任何网站变成命令行 API。13 平台 41 命令 — 头条、小红书、知乎、B站、GitHub、豆瓣等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.2.2
+description: 把任何网站变成命令行 API。16 平台 35 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。
+version: 0.3.0
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -136,23 +136,26 @@ bws site list
 bws zhihu/hot                      # 知乎热榜
 bws xiaohongshu/search "旅行"       # 小红书搜索
 bws bilibili/popular               # B站热门
-bws github/repo facebook/react     # GitHub 仓库
+bws weibo/hot                      # 微博热搜
 ```
 
-## 📊 内置平台（13 个）
+## 📊 内置平台（16 个）
 
 | 平台 | 说明 | 命令 |
 |-----|------|-----|
-| **今日头条** | 新闻资讯 | `toutiao/hot`, `toutiao/search` |
-| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/user_posts` |
-| **36kr** | 科技创投 | `36kr/newsflash` |
+| **今日头条** | 新闻资讯 | `toutiao/hot`, `toutiao/search`, `toutiao/feed` |
+| **澎湃新闻** | 权威新闻 | `thepaper/hot` |
+| **腾讯新闻** | 热点新闻 | `qqnews/hot` |
+| **网易新闻** | 热点新闻 | `netease/hot` |
+| **新浪新闻** | 门户新闻 | `sina/hot` |
+| **微博** | 社交热搜 | `weibo/hot` |
+| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/feed`, `xiaohongshu/me`, `xiaohongshu/user_posts` |
+| **36kr** | 科技创投 | `36kr/newsflash`, `36kr/search`, `36kr/article` |
 | **知乎** | 问答社区 | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |
 | **CSDN** | 开发者社区 | `csdn/search` |
 | **博客园** | 技术博客 | `cnblogs/search` |
-| **豆瓣** | 影视书籍 | `douban/movie`, `douban/search`, `douban/top250`, `douban/movie-hot`, `douban/movie-top`, `douban/comments` |
 | **Bilibili** | 视频弹幕 | `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/search`, `bilibili/video`, `bilibili/comments`, `bilibili/feed`, `bilibili/history`, `bilibili/me` |
 | **BOSS直聘** | 招聘平台 | `boss/search`, `boss/detail` |
-| **GitHub** | 代码托管 | `github/repo`, `github/issues`, `github/fork`, `github/pr-create`, `github/issue-create` |
 | **Baidu** | 百度搜索 | `baidu/search` |
 | **Bing** | 必应搜索 | `bing/search` |
 | **Google** | 谷歌搜索 | `google/search` |
@@ -315,23 +318,27 @@ bws bilibili/popular --jq '.videos[] | {title, play}'
 
 ---
 
-### 操作 8：获取 GitHub 仓库信息
+### 操作 8：获取微博热搜
 
-**场景**：用户想查看某个 GitHub 仓库
+**场景**：用户想查看微博热搜
 
 **命令**：
 ```bash
-bws github/repo facebook/react
+bws weibo/hot
 ```
 
 **输出示例**：
 ```json
 {
-  "name": "react",
-  "description": "A declarative, efficient, and flexible JavaScript library...",
-  "stars": 220000,
-  "forks": 45000,
-  "language": "JavaScript"
+  "count": 30,
+  "items": [
+    {
+      "rank": 1,
+      "title": "某某事件",
+      "hot": 1234567,
+      "url": "https://s.weibo.com/weibo?q=..."
+    }
+  ]
 }
 ```
 
@@ -493,8 +500,8 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.2.2
-- **最后更新**: 2026-04-07
+- **版本**: 0.3.0
+- **最后更新**: 2026-04-10
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
 

@@ -18,20 +18,23 @@ npx --yes browser-web-search site bilibili/popular      # B站热门
 npx --yes browser-web-search site zhihu/hot --jq '.items[].title'
 ```
 
-## 内置平台（13 个）
+## 内置平台（16 个）
 
 | 平台 | 命令 |
 |-----|------|
-| **今日头条** | `toutiao/hot`, `toutiao/search` |
-| **小红书** | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/user_posts` |
-| **36kr** | `36kr/newsflash` |
+| **今日头条** | `toutiao/hot`, `toutiao/search`, `toutiao/feed` |
+| **澎湃新闻** | `thepaper/hot` |
+| **腾讯新闻** | `qqnews/hot` |
+| **网易新闻** | `netease/hot` |
+| **新浪新闻** | `sina/hot` |
+| **微博** | `weibo/hot` |
+| **小红书** | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/feed`, `xiaohongshu/me`, `xiaohongshu/user_posts` |
+| **36kr** | `36kr/newsflash`, `36kr/search`, `36kr/article` |
 | **知乎** | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |
 | **CSDN** | `csdn/search` |
 | **博客园** | `cnblogs/search` |
-| **豆瓣** | `douban/movie`, `douban/search`, `douban/top250`, `douban/movie-hot`, `douban/movie-top`, `douban/comments` |
 | **Bilibili** | `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/search`, `bilibili/video`, `bilibili/comments`, `bilibili/feed`, `bilibili/history`, `bilibili/me` |
 | **BOSS直聘** | `boss/search`, `boss/detail` |
-| **GitHub** | `github/repo`, `github/issues`, `github/fork`, `github/pr-create`, `github/issue-create` |
 | **Baidu** | `baidu/search` |
 | **Bing** | `bing/search` |
 | **Google** | `google/search` |

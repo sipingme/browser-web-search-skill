@@ -1,10 +1,10 @@
 {
   "name": "browser-web-search",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "requiredEnvVars": [],
   "skill": {
     "name": "browser-web-search",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "enabled": true,
     "autoInvoke": false
   },
@@ -44,8 +44,8 @@
   "install": {
     "type": "npx",
     "package": "browser-web-search",
-    "version": "^0.2.2",
-    "execution": "npx --yes browser-web-search@^0.2.2",
+    "version": "^0.3.0",
+    "execution": "npx --yes browser-web-search@^0.3.0",
     "global": false,
     "autoInstall": false,
     "autoUpdate": false,
@@ -61,13 +61,13 @@
       "audit": "https://github.com/sipingme/browser-web-search/blob/main/src/index.ts"
     },
     "verification": {
-      "command": "npx --yes browser-web-search@^0.2.2 --version",
-      "expectedOutput": "0.2.2"
+      "command": "npx --yes browser-web-search@^0.3.0 --version",
+      "expectedOutput": "0.3.0"
     }
   },
   "dependencies": {
     "npm": [
-      "browser-web-search@^0.2.2"
+      "browser-web-search@^0.3.0"
     ],
     "binaries": [
       "openclaw"
@@ -85,8 +85,11 @@
         "*.zhihu.com",
         "*.xiaohongshu.com",
         "*.bilibili.com",
-        "*.douban.com",
-        "*.github.com",
+        "*.thepaper.cn",
+        "*.qq.com",
+        "*.163.com",
+        "*.sina.com.cn",
+        "*.weibo.com",
         "*.toutiao.com",
         "*.36kr.com",
         "*.baidu.com",
