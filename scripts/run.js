@@ -3,7 +3,7 @@
 const { spawnSync } = require('node:child_process');
 
 // 所需版本（与 config.json 中 dependencies.npm 保持一致）
-const REQUIRED_VERSION = '0.2.2';
+const REQUIRED_VERSION = '0.3.1';
 
 const command = process.argv[2];
 const args = process.argv.slice(3);
@@ -56,8 +56,8 @@ browser-web-search-skill v${REQUIRED_VERSION}
   --jq <expr>         对 JSON 输出应用 jq 过滤
 
 内置平台:
-  知乎、小红书、B站、豆瓣、GitHub、今日头条、36kr、
-  百度、Bing、Google、CSDN、博客园、BOSS直聘
+  知乎、小红书、B站、今日头条、36kr、澎湃、腾讯、网易、
+  新浪、微博、微信公众号、百度、Bing、Google、CSDN、博客园、BOSS直聘
 
 前提条件:
   需要 OpenClaw 环境运行（openclaw 命令可用）
