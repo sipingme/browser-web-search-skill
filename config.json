@@ -1,10 +1,19 @@
 {
   "name": "browser-web-search",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "requiredEnvVars": [],
+  "requires": {
+    "runtime": {
+      "node": ">=18.0.0"
+    },
+    "binaries": ["openclaw"],
+    "packages": {
+      "npm": "browser-web-search@^0.3.4"
+    }
+  },
   "skill": {
     "name": "browser-web-search",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "enabled": true,
     "autoInvoke": false
   },
@@ -44,8 +53,8 @@
   "install": {
     "type": "npx",
     "package": "browser-web-search",
-    "version": "^0.3.3",
-    "execution": "npx --yes browser-web-search@^0.3.3",
+    "version": "^0.3.4",
+    "execution": "npx --yes browser-web-search@^0.3.4",
     "global": false,
     "autoInstall": false,
     "autoUpdate": false,
@@ -61,13 +70,13 @@
       "audit": "https://github.com/sipingme/browser-web-search/blob/main/src/index.ts"
     },
     "verification": {
-      "command": "npx --yes browser-web-search@^0.3.3 --version",
-      "expectedOutput": "0.3.3"
+      "command": "npx --yes browser-web-search@^0.3.4 --version",
+      "expectedOutput": "0.3.4"
     }
   },
   "dependencies": {
     "npm": [
-      "browser-web-search@^0.3.3"
+      "browser-web-search@^0.3.4"
     ],
     "binaries": [
       "openclaw"
