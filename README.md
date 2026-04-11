@@ -5,17 +5,20 @@
 ## 快速开始
 
 ```bash
+# 安装
+npm install -g browser-web-search@0.3.8
+
 # 查看所有命令
-npx --yes browser-web-search site list
+bws site list
 
 # 运行
-npx --yes browser-web-search site toutiao/hot           # 今日头条热榜
-npx --yes browser-web-search site xiaohongshu/search "旅行"  # 小红书搜索
-npx --yes browser-web-search site zhihu/hot             # 知乎热榜
-npx --yes browser-web-search site bilibili/popular      # B站热门
+bws toutiao/hot                      # 今日头条热榜
+bws xiaohongshu/search "旅行"        # 小红书搜索
+bws zhihu/hot                        # 知乎热榜
+bws bilibili/popular                 # B站热门
 
 # jq 过滤
-npx --yes browser-web-search site zhihu/hot --jq '.items[].title'
+bws zhihu/hot --jq '.items[].title'
 ```
 
 ## 内置平台（17 个）
