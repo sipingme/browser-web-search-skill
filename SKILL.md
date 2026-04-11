@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
 description: 把任何网站变成命令行 API。17 平台 37 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.3.2
+version: 0.3.3
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -13,16 +13,14 @@ requires:
       description: Node.js 包管理器（随 Node.js 安装）
   packages:
     - npm: browser-web-search
-      global: true
+      global: false
   binaries:
-    - name: bws
-      providedBy: browser-web-search
     - name: openclaw
       description: OpenClaw CLI，用于浏览器自动化
 install:
-  command: npm install -g browser-web-search
-  riskLevel: moderate
-  riskReason: 全局安装第三方 npm 包，会在主机上执行未经审计的代码。包代码不包含在此 Skill 中，需独立审查。
+  command: npx --yes browser-web-search@^0.3.3
+  riskLevel: high
+  riskReason: 通过 npx 动态拉取并执行第三方 npm 包，该包会在浏览器页面上下文中执行 JavaScript，可访问站点认证数据。存在供应链风险，使用前请审计源码。
   requiresApproval: true
   source:
     registry: npmjs.com
@@ -116,14 +114,17 @@ bws 命令
 ### 安装 browser-web-search
 
 ```bash
+# 通过 npx 动态执行（无需全局安装）
+npx --yes browser-web-search@^0.3.3 --version
+
+# 或全局安装（可选）
 npm install -g browser-web-search
 ```
 
 ### 验证安装
 
 ```bash
-bws --version
-bws site list
+npx --yes browser-web-search@^0.3.3 site list
 ```
 
 ## 🚀 快速开始
@@ -501,7 +502,7 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.3.2
+- **版本**: 0.3.3
 - **最后更新**: 2026-04-10
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
@@ -512,10 +513,9 @@ bws xiaohongshu/search "露营"
 
 新用户应该能在 2 分钟内完成：
 
-- [ ] 安装工具：`npm install -g browser-web-search`
-- [ ] 检查安装：`bws --version`
-- [ ] 查看命令：`bws site list`
-- [ ] 测试运行：`bws zhihu/hot`
+- [ ] 安装工具：`npx --yes browser-web-search@^0.3.3 --version`
+- [ ] 查看命令：`npx --yes browser-web-search@^0.3.3 site list`
+- [ ] 测试运行：`npx --yes browser-web-search@^0.3.3 zhihu/hot`
 - [ ] 看到 JSON 输出
 
 如果以上步骤都能顺利完成，说明 Skill 已正确配置！
