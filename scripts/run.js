@@ -3,7 +3,7 @@
 const { spawnSync } = require('node:child_process');
 
 // 所需版本（与 config.json 中 dependencies.npm 保持一致）
-const REQUIRED_VERSION = '0.3.6';
+const REQUIRED_VERSION = '0.3.7';
 
 const command = process.argv[2];
 const args = process.argv.slice(3);
@@ -26,7 +26,7 @@ const run = (cmd, cmdArgs) => {
  * 使用 npx 执行 browser-web-search CLI (bws)
  */
 const runBws = (cliArgs) => {
-  run('npx', ['--yes', `browser-web-search@^${REQUIRED_VERSION}`, ...cliArgs]);
+  run('npx', ['--yes', `browser-web-search@${REQUIRED_VERSION}`, ...cliArgs]);
 };
 
 function showHelp() {
@@ -36,7 +36,7 @@ browser-web-search-skill v${REQUIRED_VERSION}
 
 用法: 
   通过 scripts/run.js <command> [选项]
-  或直接: npx --yes browser-web-search@^${REQUIRED_VERSION} [选项]
+  或直接: npx --yes browser-web-search@${REQUIRED_VERSION} [选项]
 
 命令:
   list                列出所有可用 adapter
@@ -46,10 +46,10 @@ browser-web-search-skill v${REQUIRED_VERSION}
   help                显示帮助信息
 
 示例:
-  npx --yes browser-web-search@^${REQUIRED_VERSION} site list
-  npx --yes browser-web-search@^${REQUIRED_VERSION} zhihu/hot
-  npx --yes browser-web-search@^${REQUIRED_VERSION} xiaohongshu/search "旅行"
-  npx --yes browser-web-search@^${REQUIRED_VERSION} bilibili/popular --json
+  npx --yes browser-web-search@${REQUIRED_VERSION} site list
+  npx --yes browser-web-search@${REQUIRED_VERSION} zhihu/hot
+  npx --yes browser-web-search@${REQUIRED_VERSION} xiaohongshu/search "旅行"
+  npx --yes browser-web-search@${REQUIRED_VERSION} bilibili/popular --json
 
 选项:
   --json              JSON 格式输出

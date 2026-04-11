@@ -5,7 +5,7 @@
  * 显示安装后的使用说明
  */
 
-const REQUIRED_VERSION = '0.3.6';
+const REQUIRED_VERSION = '0.3.7';
 
 console.log(`
 ╔══════════════════════════════════════════════════════════════════╗
@@ -21,16 +21,16 @@ console.log(`
 🚀 快速开始:
 
    # 查看所有可用命令
-   npx --yes browser-web-search@^${REQUIRED_VERSION} site list
+   npx --yes browser-web-search@${REQUIRED_VERSION} site list
 
    # 运行 adapter
-   npx --yes browser-web-search@^${REQUIRED_VERSION} zhihu/hot
-   npx --yes browser-web-search@^${REQUIRED_VERSION} xiaohongshu/search "旅行"
-   npx --yes browser-web-search@^${REQUIRED_VERSION} bilibili/popular
+   npx --yes browser-web-search@${REQUIRED_VERSION} zhihu/hot
+   npx --yes browser-web-search@${REQUIRED_VERSION} xiaohongshu/search "旅行"
+   npx --yes browser-web-search@${REQUIRED_VERSION} bilibili/popular
 
    # JSON 输出 + jq 过滤
-   npx --yes browser-web-search@^${REQUIRED_VERSION} zhihu/hot --json
-   npx --yes browser-web-search@^${REQUIRED_VERSION} zhihu/hot --jq '.[].title'
+   npx --yes browser-web-search@${REQUIRED_VERSION} zhihu/hot --json
+   npx --yes browser-web-search@${REQUIRED_VERSION} zhihu/hot --jq '.[].title'
 
 ⚠️  前提条件:
    - Node.js >= 18.0.0
