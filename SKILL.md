@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 把任何网站变成命令行 API。17 平台 37 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。返回结构化 JSON（含文章 url），可配合 news-to-markdown skill 进一步读取文章正文。
-version: 0.3.9
+description: 一行命令搜遍全网 — 30 个平台 50 个命令，头条、知乎、GitHub、Reddit、Hacker News 等。专为 OpenClaw 设计，复用浏览器登录态，返回结构化 JSON，天然适配 AI Agent 工具调用。
+version: 0.4.2
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -18,7 +18,7 @@ requires:
     - name: openclaw
       description: OpenClaw CLI，用于浏览器自动化
 install:
-  command: npm install -g browser-web-search@0.3.9
+  command: npm install -g browser-web-search@0.4.2
   riskLevel: medium
   riskReason: 通过 npm 全局安装第三方包，该包会在浏览器页面上下文中执行 JavaScript。安装前请审计源码。
   requiresApproval: true
@@ -78,7 +78,9 @@ npm: https://www.npmjs.com/package/browser-web-search
 
 # Browser Web Search (BWS) Skill
 
-把任何网站变成命令行 API，专为 OpenClaw 设计，复用浏览器登录态。
+> **一行命令，搜遍全网** — 为 AI Agent 而生的多平台内容搜索工具
+
+把 30 个主流平台的搜索接口封装成统一命令行 API，让 AI Agent 直接拿到结构化 JSON，无需 API Key，无需额外配置。
 
 ## 🏗️ 架构说明
 
@@ -89,32 +91,20 @@ browser-web-search-skill
     ↓ (调用 CLI)
 bws 命令
     ↓ (OpenClaw Browser)
-目标网站
+目标网站（30 个平台）
 ```
 
-## 🎯 项目特点
+## 🎯 核心特点
 
-### 专为 OpenClaw 设计
-- **零配置**：无需 Chrome Extension、无需 Daemon，开箱即用
-- **深度集成**：直接使用 OpenClaw 浏览器，与其他 Skill 共享登录态
-- **轻量精简**：核心代码仅 22KB，无运行时依赖
+- 🔍 **跨平台搜索** — 今日头条、知乎、GitHub、Reddit、Hacker News… 一套语法搞定
+- 🔑 **无需 API Key** — 复用浏览器登录态，开箱即用
+- 🤖 **AI Agent 友好** — 结构化 JSON 输出，支持 `--jq` 过滤，天然适配 LLM 工具调用
+- ⚡ **零配置** — 无需 Chrome Extension，无需后台 Daemon
 
-### 复用登录态
-- **无需 API Key**：使用你在浏览器中的登录状态
-- **绕过反爬**：请求来自真实浏览器，不会被封禁
-- **隐私安全**：数据在本地处理，不经过第三方服务器
-
-### AI Agent 友好
-- **结构化输出**：所有命令返回 JSON，便于 AI 解析
-- **jq 过滤**：内置 jq 支持，精确提取所需数据
-- **错误提示**：清晰的错误信息和修复建议
-
-## 📋 前置要求
-
-### 安装 browser-web-search
+## 📋 安装
 
 ```bash
-npm install -g browser-web-search@0.3.9
+npm install -g browser-web-search@0.4.2
 ```
 
 ### 验证安装
@@ -127,263 +117,155 @@ bws site list
 ## 🚀 快速开始
 
 ```bash
+# 搜索今日头条关于 "ai search" 的最新文章
+bws site toutiao/search "ai search"
+
+# 搜索知乎，返回 5 条
+bws site zhihu/search "ai agent" --count 5
+
+# Hacker News 最新讨论（按时间）
+bws site hn/search "llm" --sort date
+
+# GitHub 热门仓库（按 Star 数）
+bws site github/search "ai search" --sort stars
+
+# Reddit 最新帖子
+bws site reddit/search "ai search" --sort new
+
 # 查看所有可用命令
 bws site list
-
-# 运行 adapter
-bws zhihu/hot                      # 知乎热榜
-bws xiaohongshu/search "旅行"       # 小红书搜索
-bws bilibili/popular               # B站热门
-bws weibo/hot                      # 微博热搜
 ```
 
-## 📊 内置平台（17 个）
+## 📊 内置平台（30 个）
+
+### 🇨🇳 国内平台（20 个）
 
 | 平台 | 说明 | 命令 |
 |-----|------|-----|
-| **今日头条** | 新闻资讯 | `toutiao/hot`, `toutiao/search`, `toutiao/feed` |
-| **澎湃新闻** | 权威新闻 | `thepaper/hot` |
-| **腾讯新闻** | 热点新闻 | `qqnews/hot` |
-| **网易新闻** | 热点新闻 | `netease/hot` |
-| **新浪新闻** | 门户新闻 | `sina/hot` |
-| **微博** | 社交热搜 | `weibo/hot` |
+| **今日头条** | 新闻资讯 | `toutiao/search`, `toutiao/hot`, `toutiao/feed` |
 | **微信公众号** | 公众号文章 | `weixin/search`, `weixin/article` |
-| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/feed`, `xiaohongshu/me`, `xiaohongshu/user_posts` |
-| **36kr** | 科技创投 | `36kr/newsflash`, `36kr/search`, `36kr/article` |
-| **知乎** | 问答社区 | `zhihu/hot`, `zhihu/search`, `zhihu/question`, `zhihu/me` |
+| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note` |
+| **知乎** | 问答社区 | `zhihu/search`, `zhihu/hot`, `zhihu/question`, `zhihu/me` |
+| **微博** | 社交热搜 | `weibo/search`, `weibo/hot` |
+| **Bilibili** | 视频弹幕 | `bilibili/search`, `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/video` |
+| **澎湃新闻** | 权威新闻 | `thepaper/search`, `thepaper/hot` |
+| **腾讯新闻** | 热点新闻 | `qqnews/search`, `qqnews/hot` |
+| **网易新闻** | 热点新闻 | `netease/search`, `netease/hot` |
+| **新浪新闻** | 门户新闻 | `sina/search`, `sina/hot` |
+| **36kr** | 科技创投 | `36kr/search`, `36kr/newsflash`, `36kr/article` |
+| **虎嗅** | 科技商业媒体 | `huxiu/search` |
+| **华尔街见闻** | 财经资讯 | `wallstreetcn/search` |
+| **雪球** | 股票社区 | `xueqiu/search` |
+| **掘金** | 技术社区 | `juejin/search` |
 | **CSDN** | 开发者社区 | `csdn/search` |
 | **博客园** | 技术博客 | `cnblogs/search` |
-| **Bilibili** | 视频弹幕 | `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/search`, `bilibili/video`, `bilibili/comments`, `bilibili/feed`, `bilibili/history`, `bilibili/me` |
+| **V2EX** | 技术社区 | `v2ex/search` |
 | **BOSS直聘** | 招聘平台 | `boss/search`, `boss/detail` |
 | **Baidu** | 百度搜索 | `baidu/search` |
-| **Bing** | 必应搜索 | `bing/search` |
+
+### 🌏 国际平台（10 个）
+
+| 平台 | 说明 | 命令 |
+|-----|------|-----|
 | **Google** | 谷歌搜索 | `google/search` |
+| **Bing** | 必应搜索 | `bing/search` |
+| **GitHub** | 代码托管 | `github/search` |
+| **Hacker News** | 科技社区 (YC) | `hn/search` |
+| **Reddit** | 英文社区 | `reddit/search` |
+| **X (Twitter)** | 社交媒体 | `x/search` |
+| **The Verge** | 科技媒体 | `verge/search` |
+| **Ars Technica** | 深度科技媒体 | `ars/search` |
+| **Engadget** | 科技消费媒体 | `engadget/search` |
+| **InfoQ** | 技术媒体 | `infoq/search` |
 
-## 🔧 标准操作流程 (SOP)
+## 🔧 命令参考
 
-### 操作 1：查看可用命令
-
-**场景**：用户想知道有哪些可用的 adapter
-
-**命令**：
 ```bash
-bws site list
+bws site list                        # 列出所有 adapter
+bws site info <name>                 # 查看 adapter 参数说明
+bws site <name> [args...]            # 运行 adapter
+bws site <name> --count 5           # 限制返回数量
+bws site <name> --json               # 输出原始 JSON
+bws site <name> --jq '.items[].url' # jq 过滤提取字段
 ```
 
-**输出示例**：
-```
-zhihu/
-  hot                  - Get Zhihu hot list
-  search               - Search Zhihu
-  question             - Get question details
-  me                   - Get logged-in user info
+## 📋 标准操作流程 (SOP)
 
-xiaohongshu/
-  search               - 搜索小红书笔记
-  note                 - 获取笔记详情
-  ...
+### 操作 1：跨平台搜索
+
+**场景**：用户想搜索多个平台关于某话题的最新内容
+
+```bash
+# 国内平台
+bws site toutiao/search "ai agent" --count 5
+bws site zhihu/search "ai agent" --count 5
+bws site huxiu/search "ai agent" --count 5
+
+# 国际平台
+bws site hn/search "ai agent" --sort date --count 5
+bws site reddit/search "ai agent" --sort new --count 5
+bws site github/search "ai agent" --sort stars --count 5
 ```
 
 ---
 
-### 操作 2：搜索 adapter
+### 操作 2：获取热点资讯
 
-**场景**：用户想找特定平台的命令
-
-**命令**：
 ```bash
-bws site search bilibili
-```
-
-**输出示例**：
-```
-bilibili/popular       Get Bilibili popular videos
-bilibili/search        Search Bilibili videos
-bilibili/video         Get video details
-...
+bws site zhihu/hot        # 知乎热榜
+bws site weibo/hot        # 微博热搜
+bws site toutiao/hot      # 今日头条热榜
+bws site thepaper/hot     # 澎湃新闻热点
 ```
 
 ---
 
-### 操作 3：查看 adapter 详情
+### 操作 3：使用 jq 过滤数据
 
-**场景**：用户想了解某个命令的参数
-
-**命令**：
 ```bash
-bws site info bilibili/video
-```
+# 只提取标题
+bws site zhihu/search "大模型" --jq '[.items[].title]'
 
-**输出示例**：
-```
-bilibili/video - Get Bilibili video details by bvid
+# 只提取 URL 列表
+bws site hn/search "llm" --jq '[.items[].url]'
 
-参数:
-  bvid (required)      视频 BV 号
-
-示例:
-  bws site bilibili/video BV1xx411c7mD
+# 提取标题+日期
+bws site toutiao/search "ai" --jq '[.items[] | {title, date}]'
 ```
 
 ---
 
-### 操作 4：获取知乎热榜
-
-**场景**：用户想获取知乎热门话题
-
-**命令**：
-```bash
-bws zhihu/hot
-```
-
-**输出示例**：
-```json
-{
-  "items": [
-    {
-      "title": "如何评价...",
-      "url": "https://www.zhihu.com/question/...",
-      "heat": "1234万热度"
-    }
-  ]
-}
-```
-
----
-
-### 操作 5：搜索小红书
-
-**场景**：用户想搜索小红书内容
-
-**命令**：
-```bash
-bws xiaohongshu/search "旅行攻略"
-```
-
-**输出示例**：
-```json
-{
-  "notes": [
-    {
-      "id": "abc123",
-      "title": "云南旅行攻略",
-      "author": "旅行博主",
-      "likes": 1234
-    }
-  ]
-}
-```
-
----
-
-### 操作 6：获取 B站热门视频
-
-**场景**：用户想看 B站热门
-
-**命令**：
-```bash
-bws bilibili/popular
-```
-
-**输出示例**：
-```json
-{
-  "videos": [
-    {
-      "bvid": "BV1xx411c7mD",
-      "title": "视频标题",
-      "author": "UP主",
-      "play": "100万",
-      "like": "5万"
-    }
-  ]
-}
-```
-
----
-
-### 操作 7：使用 jq 过滤
-
-**场景**：用户只需要部分数据
-
-**命令**：
-```bash
-# 只获取标题
-bws zhihu/hot --jq '.items[].title'
-
-# 提取特定字段
-bws bilibili/popular --jq '.videos[] | {title, play}'
-```
-
----
-
-### 操作 8：获取微博热搜
-
-**场景**：用户想查看微博热搜
-
-**命令**：
-```bash
-bws weibo/hot
-```
-
-**输出示例**：
-```json
-{
-  "count": 30,
-  "items": [
-    {
-      "rank": 1,
-      "title": "某某事件",
-      "hot": 1234567,
-      "url": "https://s.weibo.com/weibo?q=..."
-    }
-  ]
-}
-```
-
----
-
-### 操作 9：搜索引擎搜索
-
-**场景**：用户想使用搜索引擎
-
-**命令**：
-```bash
-bws google/search "OpenClaw AI"
-bws baidu/search "人工智能"
-bws bing/search "machine learning"
-```
-
----
-
-### 操作 10：搜索文章并获取完整正文（配合 news-to-markdown）
-
-**场景**：用户不只想要标题和链接，还要读到完整的文章正文
+### 操作 4：搜索文章并获取完整正文（配合 news-to-markdown）
 
 **两步流水线**：
 
 ```bash
 # Step 1：用 bws 搜索，拿到文章 URL 列表
-bws toutiao/search "ai agent" --count 3 --sort time
+bws site toutiao/search "ai agent" --count 3
 
 # Step 2：对每个 url 调用 news-to-markdown 获取正文
 npx --yes news-to-markdown@latest "https://www.toutiao.com/article/xxx"
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/yyy"
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/zzz"
 ```
-
-**说明**：
-- `bws` 负责搜索，输出含 `url` 字段的 JSON
-- `news-to-markdown` 负责读取正文，输出干净的 Markdown
-- 两个工具职责分离，Agent 可自由组合任意平台的搜索 + 读取
 
 **适用平台**：头条、微信公众号、36kr、知乎、小红书等 news-to-markdown 支持的平台
 
 ---
 
-## 🔧 技术架构：如何访问登录态
+### 操作 5：登录态管理
 
-BWS **不直接读取**浏览器 Cookie 文件或用户配置文件。它通过 OpenClaw 提供的 API 与浏览器交互：
+部分平台（微信公众号、小红书、微博、X 等）需要登录：
+
+```bash
+# 在 OpenClaw 浏览器中登录
+openclaw browser open https://weixin.qq.com
+
+# 登录完成后重试
+bws site weixin/search "ai"
+```
+
+---
+
+## 🔧 技术架构：如何访问登录态
 
 ```
 bws 命令
@@ -393,25 +275,6 @@ openclaw browser evaluate <script>
 目标网站（使用该标签页的登录态）
 ```
 
-### 工作原理
-
-1. **BWS 调用 OpenClaw CLI**：
-   ```bash
-   openclaw browser evaluate --domain "zhihu.com" "<adapter-script>"
-   ```
-
-2. **OpenClaw 在浏览器标签页中执行脚本**：
-   - 找到匹配域名的已打开标签页
-   - 或打开新标签页访问目标网站
-   - 在页面上下文中执行 adapter 脚本
-
-3. **脚本在页面中运行**：
-   - 脚本以网页的身份运行（如同 DevTools Console）
-   - 自动继承该页面的登录态（Cookie、Session）
-   - 通过 DOM 操作或 fetch 获取数据
-
-### 数据访问范围
-
 | 访问内容 | 是否访问 | 说明 |
 |---------|---------|------|
 | 浏览器 Cookie 文件 | ❌ 否 | 不直接读取 `~/.config/chromium/Cookies` 等文件 |
@@ -420,123 +283,36 @@ openclaw browser evaluate <script>
 | 当前页面 DOM | ✅ 是 | adapter 脚本在页面中执行 |
 | 当前页面 Session | ✅ 是 | 继承页面的登录状态 |
 
-### 安全边界
-
-- **隔离性**：每个 adapter 只能访问其声明的 `domain`
-- **透明性**：所有 adapter 代码是公开的 JS 文件，可审计
-- **无持久化**：BWS 不保存任何 Cookie 或 Session Token
-- **用户控制**：登录操作由用户在浏览器中手动完成
-
----
-
-## ⚠️ 登录态管理
-
-如果网站需要登录，命令会返回 401/403 错误。
-
-**解决步骤**：
-
-1. 在 OpenClaw 浏览器中打开网站：
-   ```bash
-   openclaw browser open https://xiaohongshu.com
-   ```
-
-2. 手动完成登录（BWS 不参与此过程）
-
-3. 重试命令：
-   ```bash
-   bws xiaohongshu/me
-   ```
-
-**注意**：BWS 只是在已登录的页面中执行脚本，不会存储或传输你的登录凭证。
-
----
-
-## 📝 输出格式
-
-所有命令默认返回 JSON 格式：
-
-**成功响应**：
-```json
-{
-  "items": [...],
-  "count": 10
-}
-```
-
-**错误响应**：
-```json
-{
-  "success": false,
-  "error": "错误信息"
-}
-```
-
----
-
-## 🎓 示例对话
-
-**用户**：帮我看看知乎今天有什么热门话题
-
-**AI**：好的，我来获取知乎热榜。
-
-```bash
-bws zhihu/hot
-```
-
-**AI**：以下是知乎热榜前 10：
-1. 如何评价...（1234万热度）
-2. 为什么...（890万热度）
-...
-
----
-
-**用户**：搜索头条最新 3 篇关于 AI Agent 的文章，给我每篇的完整正文
-
-**AI**：好的，先搜索文章列表，再逐篇获取正文。
-
-```bash
-# Step 1：搜索
-bws toutiao/search "AI Agent" --count 3 --sort time
-```
-
-拿到 3 个 URL 后，逐篇读取正文：
-
-```bash
-# Step 2：获取正文（对每个 url 执行）
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/111"
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/222"
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/333"
-```
-
-**AI**：以下是 3 篇文章的完整内容：
-
-**第 1 篇：《OpenAI 发布新一代 Agent 框架》**
-> 作者：机器之心 | 2025-04-24
-> （正文 Markdown...）
-
----
-
-**用户**：搜索一下小红书上关于"露营"的笔记
-
-**AI**：好的，我来搜索小红书。
-
-```bash
-bws xiaohongshu/search "露营"
-```
-
-**AI**：找到以下相关笔记：
-1. 《新手露营装备清单》- 点赞 5.2k
-2. 《周末露营好去处》- 点赞 3.8k
-...
-
----
-
 ## 🔒 安全性说明
 
 - ✅ 所有操作在本地执行
-- ✅ 使用 OpenClaw 浏览器的登录态
+- ✅ 按域名隔离，无法跨站访问
 - ❌ 不会收集用户信息
 - ❌ 不会上传到第三方服务器
+
+## 🎓 示例对话
+
+**用户**：搜索头条最新 3 篇关于 AI Agent 的文章
+
+```bash
+bws site toutiao/search "AI Agent" --count 3
+```
+
+---
+
+**用户**：看看 Hacker News 上关于 LLM 的最新讨论
+
+```bash
+bws site hn/search "llm" --sort date --count 5
+```
+
+---
+
+**用户**：GitHub 上 ai search 相关的热门项目
+
+```bash
+bws site github/search "ai search" --sort stars --count 5
+```
 
 ---
 
@@ -550,7 +326,7 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.3.9
+- **版本**: 0.4.2
 - **最后更新**: 2026-04-24
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
@@ -559,12 +335,8 @@ bws xiaohongshu/search "露营"
 
 ## ✅ 首次成功检查清单
 
-新用户应该能在 2 分钟内完成：
-
-- [ ] 安装工具：`npm install -g browser-web-search@0.3.9`
+- [ ] 安装工具：`npm install -g browser-web-search@0.4.2`
 - [ ] 验证版本：`bws --version`
 - [ ] 查看命令：`bws site list`
-- [ ] 测试运行：`bws zhihu/hot`
+- [ ] 测试搜索：`bws site zhihu/search "ai" --count 3`
 - [ ] 看到 JSON 输出
-
-如果以上步骤都能顺利完成，说明 Skill 已正确配置！
