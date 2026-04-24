@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 把任何网站变成命令行 API。17 平台 37 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。
-version: 0.3.8
+description: 把任何网站变成命令行 API。17 平台 37 命令 — 头条、小红书、知乎、B站、澎湃、腾讯、网易、新浪、微博等。专为 OpenClaw 设计，复用浏览器登录态。返回结构化 JSON（含文章 url），可配合 news-to-markdown skill 进一步读取文章正文。
+version: 0.3.9
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -18,7 +18,7 @@ requires:
     - name: openclaw
       description: OpenClaw CLI，用于浏览器自动化
 install:
-  command: npm install -g browser-web-search@0.3.8
+  command: npm install -g browser-web-search@0.3.9
   riskLevel: medium
   riskReason: 通过 npm 全局安装第三方包，该包会在浏览器页面上下文中执行 JavaScript。安装前请审计源码。
   requiresApproval: true
@@ -114,7 +114,7 @@ bws 命令
 ### 安装 browser-web-search
 
 ```bash
-npm install -g browser-web-search@0.3.8
+npm install -g browser-web-search@0.3.9
 ```
 
 ### 验证安装
@@ -356,6 +356,31 @@ bws bing/search "machine learning"
 
 ---
 
+### 操作 10：搜索文章并获取完整正文（配合 news-to-markdown）
+
+**场景**：用户不只想要标题和链接，还要读到完整的文章正文
+
+**两步流水线**：
+
+```bash
+# Step 1：用 bws 搜索，拿到文章 URL 列表
+bws toutiao/search "ai agent" --count 3 --sort time
+
+# Step 2：对每个 url 调用 news-to-markdown 获取正文
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/xxx"
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/yyy"
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/zzz"
+```
+
+**说明**：
+- `bws` 负责搜索，输出含 `url` 字段的 JSON
+- `news-to-markdown` 负责读取正文，输出干净的 Markdown
+- 两个工具职责分离，Agent 可自由组合任意平台的搜索 + 读取
+
+**适用平台**：头条、微信公众号、36kr、知乎、小红书等 news-to-markdown 支持的平台
+
+---
+
 ## 🔧 技术架构：如何访问登录态
 
 BWS **不直接读取**浏览器 Cookie 文件或用户配置文件。它通过 OpenClaw 提供的 API 与浏览器交互：
@@ -465,6 +490,32 @@ bws zhihu/hot
 
 ---
 
+**用户**：搜索头条最新 3 篇关于 AI Agent 的文章，给我每篇的完整正文
+
+**AI**：好的，先搜索文章列表，再逐篇获取正文。
+
+```bash
+# Step 1：搜索
+bws toutiao/search "AI Agent" --count 3 --sort time
+```
+
+拿到 3 个 URL 后，逐篇读取正文：
+
+```bash
+# Step 2：获取正文（对每个 url 执行）
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/111"
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/222"
+npx --yes news-to-markdown@latest "https://www.toutiao.com/article/333"
+```
+
+**AI**：以下是 3 篇文章的完整内容：
+
+**第 1 篇：《OpenAI 发布新一代 Agent 框架》**
+> 作者：机器之心 | 2025-04-24
+> （正文 Markdown...）
+
+---
+
 **用户**：搜索一下小红书上关于"露营"的笔记
 
 **AI**：好的，我来搜索小红书。
@@ -499,8 +550,8 @@ bws xiaohongshu/search "露营"
 
 ## 📝 维护说明
 
-- **版本**: 0.3.8
-- **最后更新**: 2026-04-10
+- **版本**: 0.3.9
+- **最后更新**: 2026-04-24
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
 
@@ -510,7 +561,7 @@ bws xiaohongshu/search "露营"
 
 新用户应该能在 2 分钟内完成：
 
-- [ ] 安装工具：`npm install -g browser-web-search@0.3.8`
+- [ ] 安装工具：`npm install -g browser-web-search@0.3.9`
 - [ ] 验证版本：`bws --version`
 - [ ] 查看命令：`bws site list`
 - [ ] 测试运行：`bws zhihu/hot`
