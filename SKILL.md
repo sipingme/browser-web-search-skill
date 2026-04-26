@@ -1,7 +1,7 @@
 ---
 name: browser-web-search
-description: 一行命令搜遍全网 — 30 个平台 50 个命令，头条、知乎、GitHub、Reddit、Hacker News 等。专为 OpenClaw 设计，复用浏览器登录态，返回结构化 JSON，天然适配 AI Agent 工具调用。
-version: 0.4.2
+description: 一行命令搜遍全网 — 55 个平台 91+ 个命令，头条、知乎、豆瓣、YouTube、GitHub、Reddit、Hacker News 等。专为 OpenClaw 设计，复用浏览器登录态，返回结构化 JSON，天然适配 AI Agent 工具调用。
+version: 0.4.3
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -18,7 +18,7 @@ requires:
     - name: openclaw
       description: OpenClaw CLI，用于浏览器自动化
 install:
-  command: npm install -g browser-web-search@0.4.2
+  command: npm install -g browser-web-search@0.4.3
   riskLevel: medium
   riskReason: 通过 npm 全局安装第三方包，该包会在浏览器页面上下文中执行 JavaScript。安装前请审计源码。
   requiresApproval: true
@@ -80,7 +80,7 @@ npm: https://www.npmjs.com/package/browser-web-search
 
 > **一行命令，搜遍全网** — 为 AI Agent 而生的多平台内容搜索工具
 
-把 30 个主流平台的搜索接口封装成统一命令行 API，让 AI Agent 直接拿到结构化 JSON，无需 API Key，无需额外配置。
+把 **55 个主流平台**的搜索接口封装成统一命令行 API，让 AI Agent 直接拿到结构化 JSON，无需 API Key，无需额外配置。
 
 ## 🏗️ 架构说明
 
@@ -91,12 +91,12 @@ browser-web-search-skill
     ↓ (调用 CLI)
 bws 命令
     ↓ (OpenClaw Browser)
-目标网站（30 个平台）
+目标网站（55 个平台）
 ```
 
 ## 🎯 核心特点
 
-- 🔍 **跨平台搜索** — 今日头条、知乎、GitHub、Reddit、Hacker News… 一套语法搞定
+- 🔍 **跨平台搜索** — 今日头条、知乎、豆瓣、YouTube、GitHub、Reddit、Hacker News… 一套语法搞定
 - 🔑 **无需 API Key** — 复用浏览器登录态，开箱即用
 - 🤖 **AI Agent 友好** — 结构化 JSON 输出，支持 `--jq` 过滤，天然适配 LLM 工具调用
 - ⚡ **零配置** — 无需 Chrome Extension，无需后台 Daemon
@@ -104,7 +104,7 @@ bws 命令
 ## 📋 安装
 
 ```bash
-npm install -g browser-web-search@0.4.2
+npm install -g browser-web-search@0.4.3
 ```
 
 ### 验证安装
@@ -132,51 +132,81 @@ bws site github/search "ai search" --sort stars
 # Reddit 最新帖子
 bws site reddit/search "ai search" --sort new
 
+# YouTube 视频搜索
+bws site youtube/search "ai agent tutorial"
+
 # 查看所有可用命令
 bws site list
 ```
 
-## 📊 内置平台（30 个）
+## 📊 内置平台（55 个）
 
-### 🇨🇳 国内平台（20 个）
+> 🔓 无需登录 · 🔐 需登录该站账号 · 🔀 依具体命令而定
 
-| 平台 | 说明 | 命令 |
-|-----|------|-----|
-| **今日头条** | 新闻资讯 | `toutiao/search`, `toutiao/hot`, `toutiao/feed` |
-| **微信公众号** | 公众号文章 | `weixin/search`, `weixin/article` |
-| **小红书** | 生活分享 | `xiaohongshu/search`, `xiaohongshu/note` |
-| **知乎** | 问答社区 | `zhihu/search`, `zhihu/hot`, `zhihu/question`, `zhihu/me` |
-| **微博** | 社交热搜 | `weibo/search`, `weibo/hot` |
-| **Bilibili** | 视频弹幕 | `bilibili/search`, `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/video` |
-| **澎湃新闻** | 权威新闻 | `thepaper/search`, `thepaper/hot` |
-| **腾讯新闻** | 热点新闻 | `qqnews/search`, `qqnews/hot` |
-| **网易新闻** | 热点新闻 | `netease/search`, `netease/hot` |
-| **新浪新闻** | 门户新闻 | `sina/search`, `sina/hot` |
-| **36kr** | 科技创投 | `36kr/search`, `36kr/newsflash`, `36kr/article` |
-| **虎嗅** | 科技商业媒体 | `huxiu/search` |
-| **华尔街见闻** | 财经资讯 | `wallstreetcn/search` |
-| **雪球** | 股票社区 | `xueqiu/search` |
-| **掘金** | 技术社区 | `juejin/search` |
-| **CSDN** | 开发者社区 | `csdn/search` |
-| **博客园** | 技术博客 | `cnblogs/search` |
-| **V2EX** | 技术社区 | `v2ex/search` |
-| **BOSS直聘** | 招聘平台 | `boss/search`, `boss/detail` |
-| **Baidu** | 百度搜索 | `baidu/search` |
+### 🇨🇳 国内平台（30 个）
 
-### 🌏 国际平台（10 个）
+| 平台 | 说明 | 登录 | 命令 |
+|-----|------|:----:|-----|
+| **今日头条** | 新闻资讯 | 🔀 | `toutiao/search`, `toutiao/hot`, `toutiao/feed` |
+| **澎湃新闻** | 权威新闻 | 🔓 | `thepaper/search`, `thepaper/hot` |
+| **腾讯新闻** | 热点新闻 | 🔓 | `qqnews/search`, `qqnews/hot` |
+| **网易新闻** | 热点新闻 | 🔓 | `netease/search`, `netease/hot` |
+| **新浪新闻** | 门户新闻 | 🔓 | `sina/search`, `sina/hot` |
+| **36kr** | 科技创投 | 🔓 | `36kr/search`, `36kr/newsflash`, `36kr/article` |
+| **虎嗅** | 科技商业媒体 | 🔓 | `huxiu/search` |
+| **华尔街见闻** | 财经资讯 | 🔓 | `wallstreetcn/search` |
+| **东方财富** | 股票行情 & 财经新闻 | 🔓 | `eastmoney/stock`, `eastmoney/news` |
+| **掘金** | 技术社区 | 🔓 | `juejin/search` |
+| **CSDN** | 开发者社区 | 🔓 | `csdn/search` |
+| **博客园** | 技术博客 | 🔓 | `cnblogs/search` |
+| **V2EX** | 技术社区 | 🔓 | `v2ex/search` |
+| **Baidu** | 百度搜索 | 🔓 | `baidu/search` |
+| **虎扑** | 体育社区 | 🔓 | `hupu/search` |
+| **有道翻译** | 中英词典/翻译 | 🔓 | `youdao/translate` |
+| **什么值得买** | 好价/优惠聚合 | 🔓 | `smzdm/search` |
+| **InfoQ** | 技术媒体 | 🔓 | `infoq/search` |
+| **微信公众号** | 公众号文章 | 🔐 | `weixin/search`, `weixin/article` |
+| **小红书** | 生活分享 | 🔐 | `xiaohongshu/search`, `xiaohongshu/note`, `xiaohongshu/comments`, `xiaohongshu/user_posts`, `xiaohongshu/me`, `xiaohongshu/feed` |
+| **知乎** | 问答社区 | 🔀 | `zhihu/search`, `zhihu/hot`, `zhihu/question`, `zhihu/me` |
+| **微博** | 社交热搜 | 🔐 | `weibo/search`, `weibo/hot` |
+| **Bilibili** | 视频弹幕 | 🔀 | `bilibili/search`, `bilibili/popular`, `bilibili/trending`, `bilibili/ranking`, `bilibili/video`, `bilibili/comments`, `bilibili/history`, `bilibili/me`, `bilibili/feed` |
+| **雪球** | 股票社区 | 🔐 | `xueqiu/search` |
+| **BOSS直聘** | 招聘平台 | 🔀 | `boss/search`, `boss/detail` |
+| **即刻** | 兴趣社区 | 🔐 | `jike/search` |
+| **豆瓣** | 影视/书籍评分社区 | 🔐 | `douban/search`, `douban/movie`, `douban/movie-hot`, `douban/top250`, `douban/comments` |
+| **起点中文网** | 网络小说 | 🔐 | `qidian/search` |
+| **携程** | 旅行/酒店/景点 | 🔐 | `ctrip/search` |
 
-| 平台 | 说明 | 命令 |
-|-----|------|-----|
-| **Google** | 谷歌搜索 | `google/search` |
-| **Bing** | 必应搜索 | `bing/search` |
-| **GitHub** | 代码托管 | `github/search` |
-| **Hacker News** | 科技社区 (YC) | `hn/search` |
-| **Reddit** | 英文社区 | `reddit/search` |
-| **X (Twitter)** | 社交媒体 | `x/search` |
-| **The Verge** | 科技媒体 | `verge/search` |
-| **Ars Technica** | 深度科技媒体 | `ars/search` |
-| **Engadget** | 科技消费媒体 | `engadget/search` |
-| **InfoQ** | 技术媒体 | `infoq/search` |
+### 🌏 国际平台（25 个）
+
+| 平台 | 说明 | 登录 | 命令 |
+|-----|------|:----:|-----|
+| **Google** | 谷歌搜索 | 🔓 | `google/search` |
+| **Bing** | 必应搜索 | 🔓 | `bing/search` |
+| **DuckDuckGo** | 隐私优先搜索 | 🔓 | `duckduckgo/search` |
+| **GitHub** | 代码托管 | 🔓 | `github/search` |
+| **Hacker News** | 科技社区 (YC) | 🔓 | `hn/search` |
+| **Reddit** | 英文社区 | 🔓 | `reddit/search` |
+| **BBC** | 国际新闻 | 🔓 | `bbc/news` |
+| **Reuters** | 路透社新闻 | 🔓 | `reuters/search` |
+| **The Verge** | 科技媒体 | 🔓 | `verge/search` |
+| **Ars Technica** | 深度科技媒体 | 🔓 | `ars/search` |
+| **Engadget** | 科技消费媒体 | 🔓 | `engadget/search` |
+| **Stack Overflow** | 开发者问答 | 🔓 | `stackoverflow/search` |
+| **Dev.to** | 开发者社区 | 🔓 | `devto/search` |
+| **npm** | Node.js 包 | 🔓 | `npm/search` |
+| **PyPI** | Python 包 | 🔓 | `pypi/search` |
+| **arXiv** | 学术论文 | 🔓 | `arxiv/search` |
+| **IMDb** | 全球最大影视数据库 | 🔓 | `imdb/search`, `imdb/movie`, `imdb/top250` |
+| **Genius** | 歌词/歌曲数据库 | 🔓 | `genius/search` |
+| **Wikipedia** | 百科全书 | 🔓 | `wikipedia/search`, `wikipedia/summary` |
+| **Open Library** | 图书数据库 | 🔓 | `openlibrary/search` |
+| **Yahoo Finance** | 美股/港股行情 | 🔓 | `yahoo-finance/quote` |
+| **GSMArena** | 手机规格数据库 | 🔓 | `gsmarena/search` |
+| **Product Hunt** | 科技产品发现 | 🔓 | `producthunt/today` |
+| **X (Twitter)** | 社交媒体 | 🔐 | `x/search` |
+| **LinkedIn** | 职业社交 | 🔐 | `linkedin/search` |
+| **YouTube** | 视频 & 字幕 & 评论 | 🔀 | `youtube/search`, `youtube/video`, `youtube/transcript`, `youtube/transcript-by-id`, `youtube/comments`, `youtube/channel`, `youtube/feed` |
 
 ## 🔧 命令参考
 
@@ -216,6 +246,8 @@ bws site zhihu/hot        # 知乎热榜
 bws site weibo/hot        # 微博热搜
 bws site toutiao/hot      # 今日头条热榜
 bws site thepaper/hot     # 澎湃新闻热点
+bws site bilibili/trending  # B 站热搜词
+bws site bilibili/popular   # B 站全站热门
 ```
 
 ---
@@ -235,32 +267,56 @@ bws site toutiao/search "ai" --jq '[.items[] | {title, date}]'
 
 ---
 
-### 操作 4：搜索文章并获取完整正文（配合 news-to-markdown）
-
-**两步流水线**：
+### 操作 4：影视 / 娱乐内容
 
 ```bash
-# Step 1：用 bws 搜索，拿到文章 URL 列表
-bws site toutiao/search "ai agent" --count 3
+# 豆瓣搜索影视
+bws site douban/search "三体"
+bws site douban/movie-hot
 
-# Step 2：对每个 url 调用 news-to-markdown 获取正文
-npx --yes news-to-markdown@latest "https://www.toutiao.com/article/xxx"
+# IMDb 搜索
+bws site imdb/search "Inception"
+bws site imdb/top250 --count 10
+
+# YouTube 视频与字幕
+bws site youtube/search "ai tutorial"
+bws site youtube/transcript-by-id --id dQw4w9WgXcQ
 ```
-
-**适用平台**：头条、微信公众号、36kr、知乎、小红书等 news-to-markdown 支持的平台
 
 ---
 
-### 操作 5：登录态管理
+### 操作 5：开发者资源搜索
 
-部分平台（微信公众号、小红书、微博、X 等）需要登录：
+```bash
+# 搜索 npm 包
+bws site npm/search "langchain"
+
+# 搜索 PyPI 包
+bws site pypi/search "openai"
+
+# arXiv 论文
+bws site arxiv/search "retrieval augmented generation" --count 5
+
+# Stack Overflow
+bws site stackoverflow/search "python async await"
+```
+
+---
+
+### 操作 6：登录态管理
+
+需要登录的站点（微信公众号、小红书、微博、X、豆瓣等）：
 
 ```bash
 # 在 OpenClaw 浏览器中登录
 openclaw browser open https://weixin.qq.com
+openclaw browser open https://x.com
+openclaw browser open https://www.xiaohongshu.com
+openclaw browser open https://www.douban.com
 
 # 登录完成后重试
 bws site weixin/search "ai"
+bws site douban/search "三体"
 ```
 
 ---
@@ -316,6 +372,22 @@ bws site github/search "ai search" --sort stars --count 5
 
 ---
 
+**用户**：豆瓣电影 Top 10
+
+```bash
+bws site douban/top250 --count 10
+```
+
+---
+
+**用户**：YouTube 搜索 AI 教程
+
+```bash
+bws site youtube/search "ai agent tutorial" --count 10
+```
+
+---
+
 ## 📚 参考资料
 
 - [项目 GitHub](https://github.com/sipingme/browser-web-search-skill)
@@ -326,8 +398,8 @@ bws site github/search "ai search" --sort stars --count 5
 
 ## 📝 维护说明
 
-- **版本**: 0.4.2
-- **最后更新**: 2026-04-24
+- **版本**: 0.4.3
+- **最后更新**: 2026-04-26
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
 
@@ -335,7 +407,7 @@ bws site github/search "ai search" --sort stars --count 5
 
 ## ✅ 首次成功检查清单
 
-- [ ] 安装工具：`npm install -g browser-web-search@0.4.2`
+- [ ] 安装工具：`npm install -g browser-web-search@0.4.3`
 - [ ] 验证版本：`bws --version`
 - [ ] 查看命令：`bws site list`
 - [ ] 测试搜索：`bws site zhihu/search "ai" --count 3`

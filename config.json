@@ -1,6 +1,6 @@
 {
   "name": "browser-web-search",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "requiredEnvVars": [],
   "requires": {
     "runtime": {
@@ -8,12 +8,12 @@
     },
     "binaries": ["openclaw", "bws"],
     "packages": {
-      "npm": "browser-web-search@0.4.2"
+      "npm": "browser-web-search@0.4.3"
     }
   },
   "skill": {
     "name": "browser-web-search",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "enabled": true,
     "autoInvoke": false
   },
@@ -53,8 +53,8 @@
   "install": {
     "type": "npm-global",
     "package": "browser-web-search",
-    "version": "0.4.2",
-    "command": "npm install -g browser-web-search@0.4.2",
+    "version": "0.4.3",
+    "command": "npm install -g browser-web-search@0.4.3",
     "binary": "bws",
     "global": true,
     "autoInstall": false,
@@ -72,12 +72,12 @@
     },
     "verification": {
       "command": "bws --version",
-      "expectedOutput": "0.4.2"
+      "expectedOutput": "0.4.3"
     }
   },
   "dependencies": {
     "npm": [
-      "browser-web-search@0.4.2"
+      "browser-web-search@0.4.3"
     ],
     "binaries": [
       "openclaw"
@@ -92,6 +92,7 @@
     "network": {
       "domains": [
         "registry.npmjs.org",
+        "*.npmjs.com",
         "*.zhihu.com",
         "*.xiaohongshu.com",
         "*.bilibili.com",
@@ -127,7 +128,35 @@
         "api.github.com",
         "*.theverge.com",
         "*.arstechnica.com",
-        "*.engadget.com"
+        "*.engadget.com",
+        "*.douban.com",
+        "*.eastmoney.com",
+        "*.jike.ruguoapp.com",
+        "*.hupu.com",
+        "*.linkedin.com",
+        "*.youtube.com",
+        "*.googleapis.com",
+        "*.arxiv.org",
+        "*.bbc.com",
+        "*.bbc.co.uk",
+        "*.reuters.com",
+        "*.dev.to",
+        "*.stackoverflow.com",
+        "*.pypi.org",
+        "*.imdb.com",
+        "*.genius.com",
+        "*.gsmarena.com",
+        "*.producthunt.com",
+        "*.wikipedia.org",
+        "*.openlibrary.org",
+        "*.yahoo.com",
+        "*.youdao.com",
+        "*.smzdm.com",
+        "*.qidian.com",
+        "*.duckduckgo.com",
+        "*.ctrip.com",
+        "*.thehackernews.com",
+        "*.duckduckgo.com"
       ],
       "note": "访问支持的平台域名，通过 OpenClaw 浏览器执行"
     },
