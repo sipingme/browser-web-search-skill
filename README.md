@@ -12,7 +12,7 @@ npm install -g browser-web-search@0.4.3
 bws site list
 
 # 搜索示例
-bws site toutiao/search "ai search"              # 今日头条
+bws site toutiao/search "ai search"             # 今日头条
 bws site zhihu/search "ai agent" --count 5      # 知乎
 bws site hn/search "llm" --sort date            # Hacker News
 bws site github/search "ai search" --sort stars # GitHub
