@@ -1,7 +1,29 @@
 ---
 name: browser-web-search
 description: 一行命令搜遍全网 — 55 个平台 91+ 个命令，头条、知乎、豆瓣、YouTube、GitHub、Reddit、Hacker News 等。专为 OpenClaw 设计，复用浏览器登录态，返回结构化 JSON，天然适配 AI Agent 工具调用。
-version: 0.4.3
+version: 0.4.10
+versionNotes: |
+  0.4.10 — Residual-risk hardening layered on the v0.4.4 sealed-tier model.
+  Adds three programmatic responses to the ClawScan May 2026 verdict's
+  remaining concern ("core functionality inherently relies on a third-party
+  dependency to handle sensitive session data"):
+
+    1. Gate 4 — Platform consent ledger at ~/.bws/consents.json.
+       Per (site, pkgVersion, entrySha512) one-time consent via the new
+       --accept-platform-consent flag. Any drift in pkgVersion or
+       entrySha512 invalidates prior consent for that site.
+    2. Transparency block printed to stderr for every sensitive call
+       (and for all calls when BWS_TRANSPARENCY=1). Machine-readable JSON
+       line naming the third-party package, audited SHA-512, gate path,
+       audit log, and consent ledger. Prevents silent invocation by a
+       wrapping AI agent.
+    3. New launcher-only --dry-run flag that runs all four gates plus
+       integrity verification, writes the audit record, and exits
+       without importing the package. Useful for CI and agent dispatch.
+
+  Underlying npm package browser-web-search remains pinned at 0.4.3 (no
+  change to the SHA-512 integrity gate, ENTRY_EXPECTED_SIZE, or symlink
+  rejection). All v0.4.4 gates remain unchanged.
 author: Ping Si <sipingme@gmail.com>
 type: cli
 requires:
@@ -62,6 +84,92 @@ capabilities:
       - 可读取账户保护的页面（私信、收藏、个人资料、订单等）
       - 访问范围取决于您在目标站点的登录权限
       - 建议仅在信任 browser-web-search 包代码后使用
+metadata:
+  openclaw:
+    primaryEnv:
+      - name: BWS_PUBLIC_ONLY
+        values: ["0", "1"]
+        default: "0"
+        purpose: Hard-isolation mode that denies all sensitive adapters (Gate 1; overrides everything below)
+      - name: BWS_ENABLE_SENSITIVE_TIER
+        values: ["0", "1"]
+        default: "0"
+        purpose: |
+          v0.4.4+: sensitive tier is sealed by default. Operator must enrol the runtime
+          via this env before any per-call/session opt-in is considered (Gate 2).
+          Responds to ClawScan May 2026 "Identity and Privilege Abuse" recommendation.
+      - name: BWS_ALLOW_SENSITIVE
+        values: ["0", "1"]
+        default: "0"
+        purpose: Session-level opt-in within the enabled sensitive tier (Gate 3)
+      - name: BWS_ALLOW_LOCAL_INSTALL
+        values: ["0", "1"]
+        default: "0"
+        purpose: Allow loading bws from launcher-local or CWD node_modules (off by default to prevent path-pivoting)
+      - name: BWS_SKIP_PLATFORM_CONSENT
+        values: ["0", "1"]
+        default: "0"
+        purpose: |
+          v0.4.10+: bypass Gate 4 (platform consent ledger). Loud stderr warning.
+          Intended only for trusted CI; loses the binding to a specific audited build.
+      - name: BWS_TRANSPARENCY
+        values: ["0", "1"]
+        default: "0"
+        purpose: |
+          v0.4.10+: also emit the [bws] transparency:{...} stderr line for
+          public adapters. Sensitive calls always emit it regardless of this var.
+    launcherOnlyFlags:
+      - name: --i-understand-sensitive
+        purpose: Gate 3 per-call opt-in for sensitive adapters
+      - name: --accept-platform-consent
+        purpose: |
+          v0.4.10+: Gate 4 per-(site, pkgVersion, entrySha512) consent.
+          First sensitive call to a site requires this flag; subsequent calls
+          with identical pkgVersion + entrySha512 reuse the stored consent.
+      - name: --dry-run
+        purpose: |
+          v0.4.10+: run Gates 1-4 + integrity + symlink rejection, write the
+          audit record, then exit WITHOUT importing the third-party package.
+          Exit 0 = would allow; non-zero = denied (audit log shows reason).
+    sensitiveTierGateOrder:
+      - "Gate 1: BWS_PUBLIC_ONLY=1 hard-isolates (overrides everything)"
+      - "Gate 2: sensitive tier sealed unless BWS_ENABLE_SENSITIVE_TIER=1"
+      - "Gate 3: per-call/session opt-in via BWS_ALLOW_SENSITIVE=1 or --i-understand-sensitive"
+      - "Gate 4 (v0.4.10): platform consent ledger at ~/.bws/consents.json, bound to (site, pkgVersion, entrySha512); --accept-platform-consent to record"
+    primaryCredentialUsage: none
+    networkUsage: indirect-via-bws
+    auditLog:
+      path: ~/.bws/audit.log
+      content: metadata-only (no payloads, no responses, args hashed via SHA-256)
+      fields: [ts, pid, adapter, site, primaryDomain, classification, decision, reason, argHash]
+      rotation: 1 MiB → audit.log.1
+    subprocessUsage: none
+    moduleLoad:
+      - file: scripts/run.js
+        function: safeRunBws
+        method: dynamic-esm-import
+        loader: "await import(file://...)"
+        target: pinned npm package "browser-web-search"
+        targetResolution: platform-standard global node_modules roots only (no PATH lookup, no shell, no require.resolve fallback)
+        targetResolutionOptIn: BWS_ALLOW_LOCAL_INSTALL=1 (adds launcher-local + CWD node_modules; off by default)
+        symlinkPolicy: rejected per path component from the candidate root down to dist/index.js
+        preImportIntegrityGate:
+          enforcedBy: scripts/run.js:verifyBwsIntegrity
+          checks:
+            - package.json name == 'browser-web-search'
+            - package.json version == '0.4.3'
+            - stat(dist/index.js).size == 22871
+            - sha512(dist/index.js) == sha512-qoGLsUMOPgzIpdxtGMv08Gjy84bkh0AF90mKG9qvagq9O2ngcKcLg+GAy3Z8bljkvdfKcrQSp55xPO9mVCuv3Q== (timing-safe compare)
+          envOverride: false
+          failureMode: deny + audit-log entry (adapter="(integrity)")
+        argSource: allow-listed-cli-args
+        argValidation:
+          - length-bounded (<= 1024 bytes per arg)
+          - control-char rejection (NUL + ASCII control)
+          - long-flag allow-list (--json/--jq/--count/--sort/--id/--limit/--page)
+          - adapter-name regex ([a-zA-Z0-9_-]{1,64}/[a-zA-Z0-9_-]{1,64})
+          - "--" delimiter between subcommand and positional args
+        purpose: Invoke the pinned 'browser-web-search' npm package in-process, with a validated argv injected via process.argv mutation, after a hard supply-chain integrity gate
 configPaths:
   - path: ~/.bws/
     required: false
@@ -339,12 +447,175 @@ openclaw browser evaluate <script>
 | 当前页面 DOM | ✅ 是 | adapter 脚本在页面中执行 |
 | 当前页面 Session | ✅ 是 | 继承页面的登录状态 |
 
-## 🔒 安全性说明
+## 🛡️ 运行安全与最小权限（必读）
 
-- ✅ 所有操作在本地执行
-- ✅ 按域名隔离，无法跨站访问
-- ❌ 不会收集用户信息
-- ❌ 不会上传到第三方服务器
+> 本 Skill 的核心工作由第三方 npm 包 `browser-web-search` 完成；该包会在已认证的浏览器标签页上下文中执行 JavaScript，因此**理论上可以读取你已登录站点的任何可见数据（私信、收藏、个人资料、订单等）**。Launcher 只能控制传给 `bws` 的参数，无法约束包内代码行为。请务必按以下原则使用。
+
+### 1) 安装前审计与版本固定
+
+```bash
+# 审计源码 (与 SKILL.md 中声明的版本严格一致)
+npm view browser-web-search@0.4.3 dist.integrity dist.shasum
+# 阅读源码: https://github.com/sipingme/browser-web-search/blob/v0.4.3/src/index.ts
+
+# 安装时跳过 install/postinstall 脚本，降低供应链注入面
+npm install -g browser-web-search@0.4.3 --ignore-scripts
+```
+
+不要使用 `latest` tag、不要使用 `^0.4.3` 之类的范围版本。每次升级前重新审计。
+
+#### Launcher 强制完整性闸门（无需用户操作）
+
+每次 `bws-skill` 调用时，launcher 在动态 `import()` 之前会校验：
+
+| 检查 | 期望值 |
+|------|--------|
+| `package.json.name` | `browser-web-search` |
+| `package.json.version` | `0.4.3` |
+| `dist/index.js` 字节数 | `22871` |
+| `dist/index.js` SHA-512 | `sha512-qoGLsUMOPgzIpdxtGMv08Gjy84bkh0AF90mKG9qvagq9O2ngcKcLg+GAy3Z8bljkvdfKcrQSp55xPO9mVCuv3Q==` |
+
+任何一项不匹配会**直接拒绝**调用并写入 `~/.bws/audit.log`（`adapter` 字段为 `"(integrity)"`）。**该闸门不接受任何 env 旁路**——如果需要升级到新版本，必须显式更新 `scripts/run.js` 中的 `REQUIRED_VERSION` / `ENTRY_SHA512_BASE64` / `ENTRY_EXPECTED_SIZE` 三个常量，并同步 `config.json` 的 `install.verification.integrity` / `capabilities.supplyChain` 字段。
+
+你可以独立复算 SHA-512 来确认本地安装：
+
+```bash
+P=$(npm root -g)/browser-web-search/dist/index.js
+shasum -a 512 "$P" | awk '{print $1}' | xxd -r -p | base64 | sed 's|^|sha512-|'
+# 应输出与上表完全一致的字符串
+```
+
+### 2) 浏览器配置隔离
+
+**强烈建议**为 OpenClaw 创建一个独立的 Chrome/Chromium profile，仅在该 profile 中登录会被本 Skill 访问的站点。**不要**让 OpenClaw 复用你日常的浏览器 profile，避免银行、邮箱、企业 SSO 等无关账号被 adapter 触达。
+
+### 3) 四层闸门：默认封印 + 显式 tier + 显式 opt-in + 平台同意账本（敏感 adapter）
+
+> **v0.4.4 重要变更**：sensitive tier 现在**默认封印**，即使你设了 `BWS_ALLOW_SENSITIVE=1` 或加了 `--i-understand-sensitive`，**也不会**让你访问敏感 adapter。这是对 ClawScan 2026-05 "Identity and Privilege Abuse" 与 "Tool Misuse and Exploitation" 两条 High Concern 的程序化响应。
+
+Launcher 把 adapter 划分为 `public` / `sensitive` 两类。`sensitive` 即默认拒绝；触发条件之一即视为敏感：
+
+- 站点位于 `ALWAYS_SENSITIVE_SITES`：`weixin / xiaohongshu / weibo / xueqiu / jike / douban / qidian / ctrip / x / linkedin`
+- 命令后缀匹配 `/(me|feed|history|comments|user_posts|article)$`，例如 `zhihu/me`、`bilibili/feed`、`youtube/history`
+- 未在白名单中的未知站点（防御未来 `bws` 新增 adapter）
+
+授权按以下顺序逐层判定（任一闸门拒绝即拒绝）：
+
+| Gate | 触发条件 | 行为 |
+|------|---------|------|
+| **1. PUBLIC_ONLY 硬隔离** | `BWS_PUBLIC_ONLY=1` | 一律拒绝 sensitive，**覆盖下面三层** |
+| **2. Tier 封印（v0.4.4 新增）** | `BWS_ENABLE_SENSITIVE_TIER ≠ 1` | 一律拒绝 sensitive；reason=`sensitive-tier-sealed` |
+| **3. 调用级 opt-in** | tier 启用后，仍需 env 或 flag | 缺一律拒绝；reason=`tier-enabled-but-no-opt-in` |
+| **4. 平台同意账本（v0.4.10 新增）** | `(site, pkgVersion, entrySha512)` 三元组无记录 | 拒绝；reason=`no-platform-consent:*`；首次需 `--accept-platform-consent` |
+
+也就是说，**最小可用敏感访问的命令组合（v0.4.10）**变成：
+
+```bash
+# 1) 必须 (一次性，建议放在专用 shell 而非 ~/.zshrc)：开启 tier
+export BWS_ENABLE_SENSITIVE_TIER=1
+
+# 2) 调用级 opt-in：任选其一
+export BWS_ALLOW_SENSITIVE=1         # 会话级
+# 或加 --i-understand-sensitive       # 单次调用
+
+# 3) v0.4.10 新增：首次访问该 site 时记录平台同意
+#    后续相同 (pkgVersion, entrySha512) 不再要求；package 升级会自动失效
+bws-skill run weixin/search "ai" --i-understand-sensitive --accept-platform-consent
+```
+
+> 💡 **--dry-run（v0.4.10）**：先用 `--dry-run` 验证闸门通过、看清 `[bws] transparency:{...}` 行，再去掉 `--dry-run` 实际调用。CI 和 AI Agent 派发可以利用 dry-run 在不真正动用浏览器 session 的前提下确认权限。
+>
+> ```bash
+> bws-skill run weixin/search "ai" \
+>   --i-understand-sensitive --accept-platform-consent --dry-run
+> # 退出码 0 = 闸门会放行；查看 stderr 的 transparency 行
+> ```
+
+**强烈建议的姿态**：
+
+| 场景 | env |
+|------|-----|
+| 仅用 hn / github / arxiv 等公共 adapter | （什么都不设；这是默认） |
+| 不可信环境 / 沙箱 agent / production | `BWS_PUBLIC_ONLY=1` |
+| 偶尔需要敏感访问的开发机 | 临时 `BWS_ENABLE_SENSITIVE_TIER=1 BWS_ALLOW_SENSITIVE=1 bws ...`，**不要**写进 shell rc |
+
+未通过任一闸门时，会返回结构化拒绝并在 stderr 给出准确的迁移提示。
+
+#### 从 < v0.4.4 迁移
+
+如果你的 agent 配置之前只有 `BWS_ALLOW_SENSITIVE=1`，调用敏感 adapter 现在会拿到：
+
+```json
+{"success":false,"error":"Adapter '...' is classified as sensitive ... Since v0.4.4 the sensitive tier is SEALED BY DEFAULT ..."}
+```
+
+补一行 `export BWS_ENABLE_SENSITIVE_TIER=1` 即可恢复。审计日志里 reason 会从 `no opt-in` 变成 `sensitive-tier-sealed`，方便你定位被这次改动影响的调用方。
+
+### 4) 审计日志
+
+Launcher 会在 `~/.bws/audit.log` 追加 JSON Lines 记录，**仅包含元数据**，**不记录任何参数原文、cookie 或响应数据**。日志超过 1 MiB 自动轮转为 `audit.log.1`。
+
+每条记录包含的字段：
+
+| 字段 | 含义 |
+|------|------|
+| `ts` | UTC 时间戳 (RFC3339) |
+| `pid` | launcher 进程 PID |
+| `adapter` | 完整 adapter 名 (如 `xiaohongshu/search`)，完整性闸门记录为 `(integrity)` |
+| `site` | 从 adapter 拆出来的站点段 |
+| `primaryDomain` | 已知站点的主域名（用于事后取证；未知站点为 `null`） |
+| `classification` | `public` / `sensitive` |
+| `decision` | `allow` / `deny` |
+| `reason` | `public` / `tier+opt-in:env` / `tier+opt-in:flag` / `BWS_PUBLIC_ONLY=1` / `sensitive-tier-sealed` / `tier-enabled-but-no-opt-in` / `entry-sha512-mismatch` / `entry-sha512-match` |
+| `argHash` | 参数 SHA-256 前 16 位（仅做去重比对，无法反推原文） |
+
+定期 review：
+
+```bash
+tail -n 50 ~/.bws/audit.log | jq -c
+
+# 仅看 sensitive 决策
+jq -c 'select(.classification=="sensitive")' ~/.bws/audit.log
+
+# 过去 30 天碰过哪些主域名
+jq -r 'select(.decision=="allow" and .primaryDomain != null) | .primaryDomain' ~/.bws/audit.log | sort -u
+
+# 因封印或缺 opt-in 被拒的调用计数（看哪些调用方需要迁移）
+jq -c 'select(.reason=="sensitive-tier-sealed" or .reason=="tier-enabled-but-no-opt-in") | .adapter' ~/.bws/audit.log | sort | uniq -c
+```
+
+### 5) 数据最小化
+
+- 优先使用公开 adapter（`hn/search`、`github/search`、`arxiv/search` 等）—— 这些不需要登录态，即使 `bws` 被恶意替换也无敏感数据可窃。
+- 用 `--jq` / `--count` 在源头减少返回字段。**不要**把整段 JSON 喂给下游 LLM 或外发到第三方服务。
+- 涉及账户保护页面时，使用一次性查询 + 立即关闭 OpenClaw 标签。
+
+### 6) 残留风险（无法在本 Skill 层面消解）
+
+- 一旦 `bws` 被调用（无论是否 sensitive 类别），它都拥有当前 OpenClaw session 的完整执行权限。Launcher 无法阻止包内代码越界访问其他已打开的标签。**唯一的硬隔离手段**是上文 (2) 的浏览器 profile 隔离 + (3) 的 `BWS_PUBLIC_ONLY=1`。
+- 若 npm 注册表上的 `browser-web-search@0.4.3` 在你审计后被重新发布（不可变性被破坏），本地已安装版本不受影响，但下次 `npm install -g` 会拉到新版本。建议把审计过的 tarball 缓存到内部 registry 或私有 mirror。
+
+## 🔒 安全模型摘要（机器可读字段已在 `config.json` 中声明）
+
+| 维度 | 状态 |
+|-----|------|
+| 子进程命令注入 | ✅ launcher 不 spawn 任何子进程；in-process ESM import |
+| Option injection 到 bws | ✅ flag allow-list + `--` 分隔 |
+| 敏感 adapter 默认封印 | ✅ v0.4.4+ tier 默认关闭，需 `BWS_ENABLE_SENSITIVE_TIER=1` 才解锁后续 opt-in |
+| 平台同意账本（首次敏感访问需明示） | ✅ v0.4.10+ Gate 4：`~/.bws/consents.json` 绑定 `(site, pkgVersion, entrySha512)`；升级或篡改自动失效 |
+| 透明性（无法被包装层悄悄调用） | ✅ v0.4.10+ 每次 sensitive 调用 stderr 打印 `[bws] transparency:{...}` JSON 行 |
+| Dry-run（CI / Agent 不真正调用包）| ✅ v0.4.10+ `--dry-run` 跑完所有闸门 + 完整性校验后退出，不 import |
+| 公共 adapter 直通 | ✅ 无需任何 env（如 `hn/search`） |
+| 硬隔离模式 | ✅ `BWS_PUBLIC_ONLY=1` 覆盖一切 opt-in 与同意账本 |
+| 审计日志（含 site / primaryDomain / dryRun） | ✅ `~/.bws/audit.log`（仅元数据） |
+| 第三方包供应链（被替换 / 篡改） | ✅ launcher 在 import 前强制校验 SHA-512，无 env 旁路；同意账本与该哈希联动失效 |
+| Path-pivoting（CWD 下放置恶意包） | ✅ 默认仅信任全局 node_modules；本地需 `BWS_ALLOW_LOCAL_INSTALL=1` |
+| 符号链接劫持入口 | ✅ 自候选根至 `dist/index.js` 任一组件为 symlink 即跳过 |
+| 包升级"静默通过"残留风险 | ✅ v0.4.10 平台同意账本与 `entrySha512` / `pkgVersion` 绑定；任一变化即失效，强制重新明示 |
+| 浏览器 session 越权（包内 JS 在审计版本内的预期行为） | ⚠️ 无法在 launcher 层消解；依赖 (2) profile 隔离 + tier 默认封印 + transparency 行 |
+| 跨标签数据访问（包内 JS 触达其他打开的标签） | ⚠️ launcher 无权约束；依赖独立 profile + 关闭无关标签 + tier 默认封印 |
+| 跨站访问 | ⚠️ adapter 域名隔离仅约束开源 adapter 的设计意图，不是运行时强制 |
+| 上传到第三方服务器 | ⚠️ 当前审计版本未观察到，但每次升级需重新审计并同步 launcher 内的固定哈希；升级会自动废除所有平台同意账本记录 |
 
 ## 🎓 示例对话
 
@@ -398,17 +669,30 @@ bws site youtube/search "ai agent tutorial" --count 10
 
 ## 📝 维护说明
 
-- **版本**: 0.4.3
-- **最后更新**: 2026-04-26
+- **Skill 版本**: 0.4.10 (Launcher + 文档 + 闸门策略)
+- **底层 npm 包**: `browser-web-search@0.4.3` (整数固定 + SHA-512 + ENTRY_EXPECTED_SIZE)
+- **最后更新**: 2026-05-11
 - **维护者**: Ping Si <sipingme@gmail.com>
 - **许可证**: MIT
+- **安全审计依据**: 见仓库 `SECURITY.md`（ClawScan May 2026 Verdict ↔ launcher/config 字段映射）
+
+### 版本变更历史
+
+- **0.4.10** (2026-05-11): 残留风险硬化（Gate 4 平台同意账本 + transparency 行 + `--dry-run`）；对 ClawScan May 2026 "suspicious classification due to inherent third-party session capability" 的直接程序化响应。**npm 固定包未变（仍 0.4.3）。**
+- **0.4.4** (2026-05-07): Sensitive tier 默认封印；SHA-512 完整性闸门（无 env 旁路）；symlink 拒绝；CWD/launcher-local 默认禁用；对 ClawScan May 2026 "Identity and Privilege Abuse" + "Tool Misuse and Exploitation" 的程序化响应。
+- **0.4.3** (2026-04-29): 扩展至 55 平台 91+ 命令。
 
 ---
 
 ## ✅ 首次成功检查清单
 
-- [ ] 安装工具：`npm install -g browser-web-search@0.4.3`
-- [ ] 验证版本：`bws --version`
-- [ ] 查看命令：`bws site list`
-- [ ] 测试搜索：`bws site zhihu/search "ai" --count 3`
-- [ ] 看到 JSON 输出
+- [ ] 安装工具（必须精确版本 + 跳过脚本）：`npm install -g browser-web-search@0.4.3 --ignore-scripts`
+- [ ] 验证 SHA-512 一致：`P=$(npm root -g)/browser-web-search/dist/index.js && shasum -a 512 "$P"`
+- [ ] 查看命令：`bws-skill list`（或直接 `bws site list`）
+- [ ] 测试**公共** adapter（无需任何 env）：`bws-skill run hn/search "llm" --count 3`
+- [ ] 看到 JSON 输出，并阅读 stderr 是否出现 `[bws] transparency:{...}`（公共 adapter 默认不出，除非 `BWS_TRANSPARENCY=1`）
+- [ ] **可选**：使用 `--dry-run` 测试敏感 adapter 闸门组合，不真正调用包
+  ```bash
+  BWS_ENABLE_SENSITIVE_TIER=1 BWS_ALLOW_SENSITIVE=1 \
+    bws-skill run zhihu/me --dry-run --accept-platform-consent
+  ```
